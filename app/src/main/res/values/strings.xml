@@ -1,0 +1,7 @@
+﻿<resources>
+    <string name="app_name">منبه المسلم</string>
+    <string name="tab_alarms">المنبه</string>
+    <string name="tab_home">أوقات الصلاة</string>
+    <string name="tab_sleep">النوم</string>
+    <string name="tab_settings">الإعدادات</string>
+</resources>
