@@ -19,6 +19,9 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -197,6 +200,7 @@ fun AlarmCard(alarm: com.iamouakil.muslimalarm.data.alarm.Alarm, onToggle: () ->
     }
 }
 
-fun Modifier.clickable(onClick: () -> Unit) = this.then(
-    Modifier.then(androidx.compose.foundation.clickable(onClick = onClick) as Modifier)
-)
+
+
+
+
