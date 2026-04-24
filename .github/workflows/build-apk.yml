@@ -24,10 +24,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    - name: Override gradle memory settings
+      run: |
+        echo "org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8" >> gradle.properties
+        echo "org.gradle.daemon=false" >> gradle.properties
+        echo "org.gradle.parallel=false" >> gradle.properties
+
     - name: Build debug APK
-      run: ./gradlew assembleDebug --no-daemon
-      env:
-        GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+      run: ./gradlew assembleDebug --no-daemon --max-workers 2
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
