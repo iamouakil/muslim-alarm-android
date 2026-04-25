@@ -19,6 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.iamouakil.muslimalarm.R
 import com.iamouakil.muslimalarm.ui.screens.*
+import com.iamouakil.muslimalarm.ui.alarm.AlarmsScreen
 
 sealed class Screen(val route: String, val labelRes: Int) {
     object Alarms : Screen("alarms", R.string.tab_alarms)
@@ -71,3 +72,4 @@ fun NavGraph() {
         }
     }
 }
+
