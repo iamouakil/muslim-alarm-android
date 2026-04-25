@@ -7,7 +7,6 @@ import com.batoulapps.adhan.Madhab
 import com.batoulapps.adhan.PrayerTimes
 import com.batoulapps.adhan.data.DateComponents
 import java.time.LocalDate
-import java.util.TimeZone
 
 enum class CalculationMethodEnum {
     MOROCCO, MUSLIM_WORLD_LEAGUE, EGYPTIAN, KARACHI, UMM_AL_QURA, KUWAIT, QATAR, NORTH_AMERICA
@@ -52,8 +51,7 @@ object PrayerCalculator {
         }
         parameters.madhab = Madhab.SHAFI
 
-        val tz = try { TimeZone.getTimeZone(timezone) } catch (e: Exception) { TimeZone.getDefault() }
-        val pt = PrayerTimes(coordinates, dateComponents, parameters, tz)
+        val pt = PrayerTimes(coordinates, dateComponents, parameters)
 
         return PrayerTimesResult(
             fajr = pt.fajr.time,
