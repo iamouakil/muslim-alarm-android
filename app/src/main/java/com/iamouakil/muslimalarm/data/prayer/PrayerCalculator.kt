@@ -3,12 +3,11 @@
 import com.batoulapps.adhan.CalculationMethod
 import com.batoulapps.adhan.CalculationParameters
 import com.batoulapps.adhan.Coordinates
-import com.batoulapps.adhan.DateComponents
-import com.batoulapps.adhan.data.DateComponents
 import com.batoulapps.adhan.Madhab
 import com.batoulapps.adhan.PrayerTimes
+import com.batoulapps.adhan.data.DateComponents
 import java.time.LocalDate
-import java.time.ZoneId
+import java.util.TimeZone
 
 enum class CalculationMethodEnum {
     MOROCCO, MUSLIM_WORLD_LEAGUE, EGYPTIAN, KARACHI, UMM_AL_QURA, KUWAIT, QATAR, NORTH_AMERICA
@@ -53,7 +52,8 @@ object PrayerCalculator {
         }
         parameters.madhab = Madhab.SHAFI
 
-        val pt = PrayerTimes(coordinates, dateComponents, parameters)
+        val tz = try { TimeZone.getTimeZone(timezone) } catch (e: Exception) { TimeZone.getDefault() }
+        val pt = PrayerTimes(coordinates, dateComponents, parameters, tz)
 
         return PrayerTimesResult(
             fajr = pt.fajr.time,
@@ -88,4 +88,3 @@ object PrayerCalculator {
         return times.maghrib + ((tomorrowFajr - times.maghrib) / 2)
     }
 }
-

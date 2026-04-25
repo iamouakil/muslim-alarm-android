@@ -21,8 +21,8 @@ fun AuroraBackground(modifier: Modifier = Modifier, content: @Composable () -> U
             .background(
                 Brush.radialGradient(
                     colors = listOf(
-                        PrimaryContainerColor.copy(alpha = 0.35f),
-                        BgColor
+                        Color(0xFF2D6A4F).copy(alpha = 0.35f),
+                        Color(0xFF0A0F0A)
                     ),
                     center = Offset(0f, 0f),
                     radius = 1500f
