@@ -90,7 +90,7 @@ fun AddEditAlarmSheet(
                                 modifier = Modifier.size(40.dp).clip(CircleShape)
                                     .background(if (isActive) PrimaryColor.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f))
                                     .border(1.dp, if (isActive) PrimaryColor else Color.White.copy(alpha = 0.1f), CircleShape)
-                                    .clickable { activeDays = if (isActive) activeDays - index else activeDays + index }),
+                                    .clickable { activeDays = if (isActive) activeDays - index else activeDays + index },
                                 contentAlignment = Alignment.Center
                             ) { Text(day, color = if (isActive) PrimaryColor else Color.Gray, fontSize = 14.sp) }
                         }
@@ -168,6 +168,7 @@ fun WheelPicker(range: IntRange, currentValue: Int, onValueChange: (Int) -> Unit
         }
     }
 }
+
 
 
 
