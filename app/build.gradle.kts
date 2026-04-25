@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    implementation("com.batoulapps.adhan:adhan-kotlin:1.2.0")
+    implementation("com.batoulapps.adhan:adhan:1.2.1")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("androidx.core:core-ktx:1.12.0")
@@ -65,4 +65,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
 
