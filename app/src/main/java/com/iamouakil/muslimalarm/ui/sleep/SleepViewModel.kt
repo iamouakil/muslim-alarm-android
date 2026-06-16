@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.iamouakil.muslimalarm.alarm.AlarmScheduler
 import com.iamouakil.muslimalarm.data.alarm.Alarm
 import com.iamouakil.muslimalarm.data.alarm.AlarmRepository
+import com.iamouakil.muslimalarm.data.prayer.CalculationMethodEnum
 import com.iamouakil.muslimalarm.data.prayer.PrayerCalculator
-import com.iamouakil.muslimalarm.data.prayer.PrayerTimesResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -166,11 +166,13 @@ class SleepViewModel @Inject constructor(
             val now = LocalDateTime.now()
             val today = now.toLocalDate()
             
+            // Temporary: using Casablanca coordinates. 
+            // This should ideally come from user preferences or GPS.
             val todayTimes = prayerCalculator.calculate(
-                today, 33.5731, -7.5898, com.iamouakil.muslimalarm.data.prayer.CalculationMethodEnum.MOROCCO
+                today, 33.5731, -7.5898, CalculationMethodEnum.MOROCCO
             )
             val tomorrowTimes = prayerCalculator.calculate(
-                today.plusDays(1), 33.5731, -7.5898, com.iamouakil.muslimalarm.data.prayer.CalculationMethodEnum.MOROCCO
+                today.plusDays(1), 33.5731, -7.5898, CalculationMethodEnum.MOROCCO
             )
             
             val qiyamMillis = prayerCalculator.lastThirdOfNight(todayTimes, tomorrowTimes.fajr)
