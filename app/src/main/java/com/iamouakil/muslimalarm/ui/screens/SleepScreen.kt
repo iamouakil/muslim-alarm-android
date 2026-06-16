@@ -2,55 +2,35 @@
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AlarmAdd
+import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.iamouakil.muslimalarm.ui.sleep.SleepViewModel
-import com.iamouakil.muslimalarm.ui.theme.BgColor
+import com.iamouakil.muslimalarm.ui.streak.StreakViewModel
 import com.iamouakil.muslimalarm.ui.theme.PrimaryColor
 import com.iamouakil.muslimalarm.ui.theme.SecondaryColor
-import com.iamouakil.muslimalarm.ui.theme.SleepBadgeColor
 import com.iamouakil.muslimalarm.ui.theme.AuroraBackground
 import com.iamouakil.muslimalarm.ui.theme.glassmorphism
 
 @Composable
-fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
-    val context = LocalContext.current
-    
-    val bedtimeHourPref by viewModel.bedtimeHour.collectAsState()
-    val bedtimeMinutePref by viewModel.bedtimeMinute.collectAsState()
-    val wakeupHourPref by viewModel.wakeupHour.collectAsState()
-    val wakeupMinutePref by viewModel.wakeupMinute.collectAsState()
-    
-    val sleepCycleOptions by viewModel.sleepCycleOptions.collectAsState()
-    val napWakeTime by viewModel.napWakeTime.collectAsState()
-    val caffeineClearTime by viewModel.caffeineClearanceTime.collectAsState()
-    val suggestedBed by viewModel.suggestedBedtime.collectAsState()
-    val qiyamTime by viewModel.qiyamTimeText.collectAsState()
-    val qiyamCountdown by viewModel.qiyamCountdown.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.setupQiyam()
-    }
+fun SleepScreen() {
+    val sleepViewModel: SleepViewModel = hiltViewModel()
+    val streakViewModel: StreakViewModel = hiltViewModel()
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         AuroraBackground {
@@ -58,324 +38,279 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                item {
-                    ExpandableCard(title = "خطة النوم") {
-                        var bedH by remember { mutableStateOf(bedtimeHourPref.toString()) }
-                        var bedM by remember { mutableStateOf(bedtimeMinutePref.toString()) }
-                        var wakeH by remember { mutableStateOf(wakeupHourPref.toString()) }
-                        var wakeM by remember { mutableStateOf(wakeupMinutePref.toString()) }
-
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = bedH,
-                                    onValueChange = { bedH = it },
-                                    label = { Text("ساعة النوم") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                                OutlinedTextField(
-                                    value = bedM,
-                                    onValueChange = { bedM = it },
-                                    label = { Text("دقيقة النوم") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = wakeH,
-                                    onValueChange = { wakeH = it },
-                                    label = { Text("ساعة الاستيقاظ") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                                OutlinedTextField(
-                                    value = wakeM,
-                                    onValueChange = { wakeM = it },
-                                    label = { Text("دقيقة الاستيقاظ") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-
-                            Button(
-                                onClick = {
-                                    val bH = bedH.toIntOrNull() ?: 22
-                                    val bM = bedM.toIntOrNull() ?: 0
-                                    val wH = wakeH.toIntOrNull() ?: 6
-                                    val wM = wakeM.toIntOrNull() ?: 0
-                                    viewModel.saveSleepPlan(bH, bM, wH, wM)
-                                    Toast.makeText(context, "تم حفظ خطة النوم وضبط المنبه", Toast.LENGTH_SHORT).show()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
-                            ) {
-                                Text("حفظ الخطة", color = MaterialTheme.colorScheme.onPrimary)
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(title = "دورات النوم") {
-                        var cBedH by remember { mutableStateOf("22") }
-                        var cBedM by remember { mutableStateOf("00") }
-
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = cBedH,
-                                    onValueChange = { cBedH = it },
-                                    label = { Text("ساعة النوم المتوقعة") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                                OutlinedTextField(
-                                    value = cBedM,
-                                    onValueChange = { cBedM = it },
-                                    label = { Text("الدقيقة") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-
-                            Button(
-                                onClick = {
-                                    val h = cBedH.toIntOrNull() ?: 22
-                                    val m = cBedM.toIntOrNull() ?: 0
-                                    viewModel.calculateSleepCycles(h, m)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
-                            ) {
-                                Text("احسب أفضل الأوقات")
-                            }
-
-                            if (sleepCycleOptions.isNotEmpty()) {
-                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    sleepCycleOptions.forEach { option ->
-                                        Divider()
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Column {
-                                                Text(
-                                                    text = "دورة ${option.cycleCount} (الجودة: ${option.qualityLabelAr})",
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 14.sp
-                                                )
-                                                Text(
-                                                    text = "وقت الاستيقاظ: ${option.wakeTime}",
-                                                    color = PrimaryColor,
-                                                    fontWeight = FontWeight.Medium
-                                                )
-                                            }
-                                            IconButton(
-                                                onClick = {
-                                                    viewModel.scheduleCycleAlarm(option)
-                                                    Toast.makeText(context, "تم ضبط منبه الدورة ${option.cycleCount}", Toast.LENGTH_SHORT).show()
-                                                }
-                                            ) {
-                                                Icon(Icons.Filled.AlarmAdd, contentDescription = "اضبط منبه", tint = PrimaryColor)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(title = "القيلولة") {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            NapButton("قيلولة نشاط (20 دقيقة)") {
-                                viewModel.scheduleNap(20)
-                                Toast.makeText(context, "تم ضبط منبه لقيلولة 20 دقيقة", Toast.LENGTH_SHORT).show()
-                            }
-                            NapButton("قيلولة الذاكرة (60 دقيقة)") {
-                                viewModel.scheduleNap(60)
-                                Toast.makeText(context, "تم ضبط منبه لقيلولة 60 دقيقة", Toast.LENGTH_SHORT).show()
-                            }
-                            NapButton("قيلولة السنة (90 دقيقة)") {
-                                viewModel.scheduleNap(90)
-                                Toast.makeText(context, "تم ضبط منبه لقيلولة 90 دقيقة", Toast.LENGTH_SHORT).show()
-                            }
-
-                            if (napWakeTime.isNotEmpty()) {
-                                Text(
-                                    text = "وقت الاستيقاظ: $napWakeTime",
-                                    color = PrimaryColor,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(top = 8.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(title = "الكافيين") {
-                        var cafH by remember { mutableStateOf("16") }
-                        var cafM by remember { mutableStateOf("00") }
-
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = cafH,
-                                    onValueChange = { cafH = it },
-                                    label = { Text("ساعة آخر كافيين") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                                OutlinedTextField(
-                                    value = cafM,
-                                    onValueChange = { cafM = it },
-                                    label = { Text("الدقيقة") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-
-                            Button(
-                                onClick = {
-                                    val h = cafH.toIntOrNull() ?: 16
-                                    val m = cafM.toIntOrNull() ?: 0
-                                    viewModel.calculateCaffeine(h, m)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = SleepBadgeColor)
-                            ) {
-                                Text("احسب موعد الخروج")
-                            }
-
-                            if (caffeineClearTime.isNotEmpty()) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text("يخرج الكافيين من جسمك تقريباً الساعة: $caffeineClearTime")
-                                    Text("أنسب وقت للنوم هو: $suggestedBed", fontWeight = FontWeight.Bold)
-                                    
-                                    Button(
-                                        onClick = {
-                                            viewModel.scheduleCaffeineSleepAlarm()
-                                            Toast.makeText(context, "تم ضبط المنبه لوقت النوم المقترح", Toast.LENGTH_SHORT).show()
-                                        },
-                                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryColor)
-                                    ) {
-                                        Text("اضبط منبه للنوم")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    ExpandableCard(title = "قيام الليل", defaultExpanded = true) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "وقت قيام الليل (الثلث الأخير): $qiyamTime",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            
-                            Text(
-                                text = "الوقت المتبقي: $qiyamCountdown",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PrimaryColor,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            Button(
-                                onClick = {
-                                    viewModel.scheduleQiyamAlarm()
-                                    Toast.makeText(context, "تم ضبط منبه القيام بنجاح", Toast.LENGTH_SHORT).show()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
-                            ) {
-                                Text("اضبط منبه القيام", color = MaterialTheme.colorScheme.onPrimary)
-                            }
-                        }
-                    }
-                }
-                
-                item { Spacer(modifier = Modifier.height(40.dp)) }
+                item { StreakSection(streakViewModel) }
+                item { SleepPlanSection(sleepViewModel) }
+                item { SleepCyclesSection(sleepViewModel) }
+                item { NapSection(sleepViewModel) }
+                item { CaffeineSection(sleepViewModel) }
+                item { QiyamSection(sleepViewModel) }
+                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
     }
 }
 
 @Composable
-fun NapButton(text: String, onClick: () -> Unit) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryColor)
-    ) {
-        Text(text)
-    }
+fun TimeInputField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.White) },
+        modifier = modifier,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
+    )
 }
 
 @Composable
 fun ExpandableCard(
     title: String,
-    defaultExpanded: Boolean = false,
+    expanded: Boolean,
+    onExpandChange: (Boolean) -> Unit,
     content: @Composable () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(defaultExpanded) }
-    val rotationState by animateFloatAsState(targetValue = if (expanded) 180f else 0f, label = "ExpandRotation")
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .glassmorphism(),
-        colors = CardDefaults.cardColors(containerColor = BgColor.copy(alpha = 0.5f))
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { expanded = !expanded },
+                    .clickable { onExpandChange(!expanded) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Text(text = title, style = MaterialTheme.typography.titleMedium, color = Color.White)
                 Icon(
-                    imageVector = Icons.Filled.ExpandMore,
-                    contentDescription = if (expanded) "طي" else "توسيع",
-                    modifier = Modifier.rotate(rotationState)
+                    imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                    contentDescription = null,
+                    tint = Color.White
                 )
             }
-            
             AnimatedVisibility(visible = expanded) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
+                Column(modifier = Modifier.padding(top = 16.dp)) {
                     content()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun StreakSection(viewModel: StreakViewModel) {
+    var expanded by remember { mutableStateOf(true) }
+    val currentStreak by viewModel.currentStreak.collectAsState()
+    val bestStreak by viewModel.bestStreak.collectAsState()
+    val canLogExcuse by viewModel.canLogExcuse.collectAsState()
+    val context = LocalContext.current
+
+    ExpandableCard(title = "سلسلة الاستمرارية", expanded = expanded, onExpandChange = { expanded = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(text = "السلسلة الحالية: $currentStreak", color = Color.White)
+            Text(text = "أفضل سلسلة: $bestStreak", color = Color.White)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {
+                        viewModel.logExcuse()
+                        Toast.makeText(context, "تم تسجيل العذر", Toast.LENGTH_SHORT).show()
+                    },
+                    enabled = canLogExcuse,
+                    colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
+                ) {
+                    Text("تسجيل عذر", color = Color.White)
+                }
+                Button(
+                    onClick = {
+                        viewModel.recordWakeup()
+                        Toast.makeText(context, "تم تسجيل استيقاظ", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+                ) {
+                    Text("محاكاة استيقاظ", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SleepPlanSection(viewModel: SleepViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    var bedH by remember { mutableStateOf("") }
+    var bedM by remember { mutableStateOf("") }
+    var wakeH by remember { mutableStateOf("") }
+    var wakeM by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    ExpandableCard(title = "خطة النوم", expanded = expanded, onExpandChange = { expanded = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TimeInputField(value = bedH, onValueChange = { bedH = it }, label = "ساعة النوم", modifier = Modifier.weight(1f))
+                TimeInputField(value = bedM, onValueChange = { bedM = it }, label = "دقيقة النوم", modifier = Modifier.weight(1f))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TimeInputField(value = wakeH, onValueChange = { wakeH = it }, label = "ساعة الاستيقاظ", modifier = Modifier.weight(1f))
+                TimeInputField(value = wakeM, onValueChange = { wakeM = it }, label = "دقيقة الاستيقاظ", modifier = Modifier.weight(1f))
+            }
+            Button(
+                onClick = {
+                    viewModel.saveSleepPlan(bedH.toIntOrNull() ?: 0, bedM.toIntOrNull() ?: 0, wakeH.toIntOrNull() ?: 0, wakeM.toIntOrNull() ?: 0)
+                    Toast.makeText(context, "تم حفظ خطة النوم وجدولة المنبه", Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+            ) {
+                Text("حفظ الخطة", color = Color.White)
+            }
+        }
+    }
+}
+
+@Composable
+fun SleepCyclesSection(viewModel: SleepViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    var bedH by remember { mutableStateOf("") }
+    var bedM by remember { mutableStateOf("") }
+    val cycles by viewModel.sleepCycleOptions.collectAsState()
+    val context = LocalContext.current
+
+    ExpandableCard(title = "دورات النوم", expanded = expanded, onExpandChange = { expanded = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TimeInputField(value = bedH, onValueChange = { bedH = it }, label = "ساعة النوم", modifier = Modifier.weight(1f))
+                TimeInputField(value = bedM, onValueChange = { bedM = it }, label = "دقيقة", modifier = Modifier.weight(1f))
+            }
+            Button(
+                onClick = { viewModel.calculateSleepCycles(bedH.toIntOrNull() ?: 0, bedM.toIntOrNull() ?: 0) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
+            ) {
+                Text("احسب أفضل الأوقات", color = Color.White)
+            }
+            if (cycles.isNotEmpty()) {
+                cycles.forEach { option ->
+                    HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("دورة ${option.cycleCount}", color = Color.White)
+                            Text("وقت الاستيقاظ: ${option.wakeTime}", color = Color.White)
+                            Text("الجودة: ${option.qualityLabelAr}", color = Color.White)
+                        }
+                        Button(
+                            onClick = {
+                                viewModel.scheduleCycleAlarm(option)
+                                Toast.makeText(context, "تم ضبط منبه لدورة ${option.cycleCount}", Toast.LENGTH_SHORT).show()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+                        ) {
+                            Text("اضبط منبه", color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NapSection(viewModel: SleepViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    val wakeTime by viewModel.napWakeTime.collectAsState()
+    val context = LocalContext.current
+
+    ExpandableCard(title = "القيلولة", expanded = expanded, onExpandChange = { expanded = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val naps = listOf(Pair("قيلولة نشاط (20 دقيقة)", 20), Pair("قيلولة الذاكرة (60 دقيقة)", 60), Pair("قيلولة السنة (90 دقيقة)", 90))
+            naps.forEach { nap ->
+                Button(
+                    onClick = {
+                        viewModel.scheduleNap(nap.second)
+                        Toast.makeText(context, "تم ضبط منبه القيلولة", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+                ) {
+                    Text(nap.first, color = Color.White)
+                }
+            }
+            if (wakeTime.isNotEmpty()) {
+                Text(text = "وقت الاستيقاظ: $wakeTime", color = Color.White, modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+        }
+    }
+}
+
+@Composable
+fun CaffeineSection(viewModel: SleepViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    var hour by remember { mutableStateOf("") }
+    var min by remember { mutableStateOf("") }
+    val clearanceTime by viewModel.caffeineClearanceTime.collectAsState()
+    val suggestedBedtime by viewModel.suggestedBedtime.collectAsState()
+    val context = LocalContext.current
+
+    ExpandableCard(title = "الكافيين", expanded = expanded, onExpandChange = { expanded = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TimeInputField(value = hour, onValueChange = { hour = it }, label = "ساعة", modifier = Modifier.weight(1f))
+                TimeInputField(value = min, onValueChange = { min = it }, label = "دقيقة", modifier = Modifier.weight(1f))
+            }
+            Button(
+                onClick = { viewModel.calculateCaffeine(hour.toIntOrNull() ?: 0, min.toIntOrNull() ?: 0) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
+            ) {
+                Text("احسب موعد الخروج", color = Color.White)
+            }
+            if (clearanceTime.isNotEmpty()) {
+                Text("نسبة الكافيين تزول تقريباً الساعة: $clearanceTime", color = Color.White)
+                Text("أنسب وقت للنوم هو: $suggestedBedtime", color = Color.White)
+                Button(
+                    onClick = {
+                        viewModel.scheduleCaffeineSleepAlarm()
+                        Toast.makeText(context, "تم ضبط منبه النوم بعد الخروج", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+                ) {
+                    Text("اضبط منبه للنوم", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun QiyamSection(viewModel: SleepViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    val qiyamTimeText by viewModel.qiyamTimeText.collectAsState()
+    val qiyamCountdown by viewModel.qiyamCountdown.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) { viewModel.setupQiyam() }
+
+    ExpandableCard(title = "قيام الليل", expanded = expanded, onExpandChange = { expanded = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("وقت قيام الليل (الثلث الأخير): $qiyamTimeText", color = Color.White)
+            Text("الوقت المتبقي: $qiyamCountdown", color = Color.White)
+            Button(
+                onClick = {
+                    viewModel.scheduleQiyamAlarm()
+                    Toast.makeText(context, "تم ضبط منبه القيام", Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+            ) {
+                Text("اضبط منبه القيام", color = Color.White)
             }
         }
     }
