@@ -1,5 +1,4 @@
-﻿// FILE: com/iamouakil/muslimalarm/ui/screens/SleepScreen.kt
-package com.iamouakil.muslimalarm.ui.screens
+﻿package com.iamouakil.muslimalarm.ui.screens
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -26,13 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.iamouakil.muslimalarm.ui.sleep.SleepViewModel
-import com.iamouakil.muslimalarm.ui.theme.BgColor
-import com.iamouakil.muslimalarm.ui.theme.PrimaryColor
-import com.iamouakil.muslimalarm.ui.theme.PrimaryContainerColor
-import com.iamouakil.muslimalarm.ui.theme.SecondaryColor
-import com.iamouakil.muslimalarm.ui.theme.SharedComponents.AuroraBackground
-import com.iamouakil.muslimalarm.ui.theme.SharedComponents.glassmorphism
-import com.iamouakil.muslimalarm.ui.theme.SleepBadgeColor
+import com.iamouakil.muslimalarm.ui.theme.Color as AppColors
+import com.iamouakil.muslimalarm.ui.theme.SharedComponents
 
 @Composable
 fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
@@ -55,7 +49,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        AuroraBackground {
+        SharedComponents.AuroraBackground {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -113,7 +107,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                     Toast.makeText(context, "تم حفظ خطة النوم وضبط المنبه", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.PrimaryColor)
                             ) {
                                 Text("حفظ الخطة", color = MaterialTheme.colorScheme.onPrimary)
                             }
@@ -151,7 +145,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                     viewModel.calculateSleepCycles(h, m)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
+                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.SecondaryColor)
                             ) {
                                 Text("احسب أفضل الأوقات")
                             }
@@ -173,7 +167,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                                 )
                                                 Text(
                                                     text = "وقت الاستيقاظ: ${option.wakeTime}",
-                                                    color = PrimaryColor,
+                                                    color = AppColors.PrimaryColor,
                                                     fontWeight = FontWeight.Medium
                                                 )
                                             }
@@ -183,7 +177,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                                     Toast.makeText(context, "تم ضبط منبه الدورة ${option.cycleCount}", Toast.LENGTH_SHORT).show()
                                                 }
                                             ) {
-                                                Icon(Icons.Filled.AlarmAdd, contentDescription = "اضبط منبه", tint = PrimaryColor)
+                                                Icon(Icons.Filled.AlarmAdd, contentDescription = "اضبط منبه", tint = AppColors.PrimaryColor)
                                             }
                                         }
                                     }
@@ -212,7 +206,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                             if (napWakeTime.isNotEmpty()) {
                                 Text(
                                     text = "وقت الاستيقاظ: $napWakeTime",
-                                    color = PrimaryColor,
+                                    color = AppColors.PrimaryColor,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(top = 8.dp)
                                 )
@@ -251,7 +245,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                     viewModel.calculateCaffeine(h, m)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = SleepBadgeColor)
+                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.SleepBadgeColor)
                             ) {
                                 Text("احسب موعد الخروج")
                             }
@@ -270,7 +264,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                             Toast.makeText(context, "تم ضبط المنبه لوقت النوم المقترح", Toast.LENGTH_SHORT).show()
                                         },
                                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryColor)
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.PrimaryColor)
                                     ) {
                                         Text("اضبط منبه للنوم")
                                     }
@@ -296,7 +290,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                 text = "الوقت المتبقي: $qiyamCountdown",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = PrimaryColor,
+                                color = AppColors.PrimaryColor,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -307,7 +301,7 @@ fun SleepScreen(viewModel: SleepViewModel = hiltViewModel()) {
                                     Toast.makeText(context, "تم ضبط منبه القيام بنجاح", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.PrimaryColor)
                             ) {
                                 Text("اضبط منبه القيام", color = MaterialTheme.colorScheme.onPrimary)
                             }
@@ -326,7 +320,7 @@ fun NapButton(text: String, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryColor)
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.PrimaryColor)
     ) {
         Text(text)
     }
@@ -344,8 +338,8 @@ fun ExpandableCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .glassmorphism(),
-        colors = CardDefaults.cardColors(containerColor = BgColor.copy(alpha = 0.5f))
+            .then(SharedComponents.glassmorphism()),
+        colors = CardDefaults.cardColors(containerColor = AppColors.BgColor.copy(alpha = 0.5f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

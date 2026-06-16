@@ -1,5 +1,4 @@
-﻿// FILE: com/iamouakil/muslimalarm/ui/sleep/SleepViewModel.kt
-package com.iamouakil.muslimalarm.ui.sleep
+﻿package com.iamouakil.muslimalarm.ui.sleep
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +6,7 @@ import com.iamouakil.muslimalarm.alarm.AlarmScheduler
 import com.iamouakil.muslimalarm.data.alarm.Alarm
 import com.iamouakil.muslimalarm.data.alarm.AlarmRepository
 import com.iamouakil.muslimalarm.data.prayer.PrayerCalculator
+import com.iamouakil.muslimalarm.data.prayer.PrayerTimesResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -82,8 +81,8 @@ class SleepViewModel @Inject constructor(
                 challenge = "none",
                 progressiveWakeup = false
             )
-            val insertedId = alarmRepository.addAlarm(alarm)
-            alarmScheduler.schedule(alarm.copy(id = insertedId.toInt()))
+            alarmRepository.insert(alarm)
+            alarmScheduler.schedule(alarm)
         }
     }
 
@@ -109,8 +108,8 @@ class SleepViewModel @Inject constructor(
                 challenge = "none",
                 progressiveWakeup = false
             )
-            val insertedId = alarmRepository.addAlarm(alarm)
-            alarmScheduler.schedule(alarm.copy(id = insertedId.toInt()))
+            alarmRepository.insert(alarm)
+            alarmScheduler.schedule(alarm)
         }
     }
 
@@ -128,8 +127,8 @@ class SleepViewModel @Inject constructor(
                 challenge = "none",
                 progressiveWakeup = false
             )
-            val insertedId = alarmRepository.addAlarm(alarm)
-            alarmScheduler.schedule(alarm.copy(id = insertedId.toInt()))
+            alarmRepository.insert(alarm)
+            alarmScheduler.schedule(alarm)
         }
     }
 
@@ -155,8 +154,8 @@ class SleepViewModel @Inject constructor(
                     challenge = "none",
                     progressiveWakeup = false
                 )
-                val insertedId = alarmRepository.addAlarm(alarm)
-                alarmScheduler.schedule(alarm.copy(id = insertedId.toInt()))
+                alarmRepository.insert(alarm)
+                alarmScheduler.schedule(alarm)
             }
         }
     }
@@ -164,7 +163,17 @@ class SleepViewModel @Inject constructor(
     fun setupQiyam() {
         qiyamJob?.cancel()
         qiyamJob = viewModelScope.launch {
-            val qiyamMillis = prayerCalculator.lastThirdOfNight()
+            val now = LocalDateTime.now()
+            val today = now.toLocalDate()
+            
+            val todayTimes = prayerCalculator.calculate(
+                today, 33.5731, -7.5898, com.iamouakil.muslimalarm.data.prayer.CalculationMethodEnum.MOROCCO
+            )
+            val tomorrowTimes = prayerCalculator.calculate(
+                today.plusDays(1), 33.5731, -7.5898, com.iamouakil.muslimalarm.data.prayer.CalculationMethodEnum.MOROCCO
+            )
+            
+            val qiyamMillis = prayerCalculator.lastThirdOfNight(todayTimes, tomorrowTimes.fajr)
             val targetDateTime = Instant.ofEpochMilli(qiyamMillis)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime()
@@ -173,8 +182,8 @@ class SleepViewModel @Inject constructor(
             _qiyamTimeText.value = targetDateTime.format(timeFormatter)
 
             while (isActive) {
-                val now = LocalDateTime.now()
-                var duration = Duration.between(now, targetDateTime)
+                val nowLoop = LocalDateTime.now()
+                val duration = java.time.Duration.between(nowLoop, targetDateTime)
                 
                 if (duration.isNegative) {
                     _qiyamCountdown.value = "00:00:00"
@@ -202,8 +211,8 @@ class SleepViewModel @Inject constructor(
                     challenge = "none",
                     progressiveWakeup = false
                 )
-                val insertedId = alarmRepository.addAlarm(alarm)
-                alarmScheduler.schedule(alarm.copy(id = insertedId.toInt()))
+                alarmRepository.insert(alarm)
+                alarmScheduler.schedule(alarm)
             }
         }
     }
