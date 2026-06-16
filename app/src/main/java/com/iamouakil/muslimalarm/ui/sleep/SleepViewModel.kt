@@ -34,8 +34,7 @@ data class SleepCycleOption(
 class SleepViewModel @Inject constructor(
     private val sleepPreferences: SleepPreferences,
     private val alarmRepository: AlarmRepository,
-    private val alarmScheduler: AlarmScheduler,
-    private val prayerCalculator: PrayerCalculator
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     val bedtimeHour = sleepPreferences.bedtimeHour.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 22)
@@ -166,16 +165,14 @@ class SleepViewModel @Inject constructor(
             val now = LocalDateTime.now()
             val today = now.toLocalDate()
             
-            // Temporary: using Casablanca coordinates. 
-            // This should ideally come from user preferences or GPS.
-            val todayTimes = prayerCalculator.calculate(
+            val todayTimes = PrayerCalculator.calculate(
                 today, 33.5731, -7.5898, CalculationMethodEnum.MOROCCO
             )
-            val tomorrowTimes = prayerCalculator.calculate(
+            val tomorrowTimes = PrayerCalculator.calculate(
                 today.plusDays(1), 33.5731, -7.5898, CalculationMethodEnum.MOROCCO
             )
             
-            val qiyamMillis = prayerCalculator.lastThirdOfNight(todayTimes, tomorrowTimes.fajr)
+            val qiyamMillis = PrayerCalculator.lastThirdOfNight(todayTimes, tomorrowTimes.fajr)
             val targetDateTime = Instant.ofEpochMilli(qiyamMillis)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime()
