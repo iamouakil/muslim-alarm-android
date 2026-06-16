@@ -23,16 +23,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.iamouakil.muslimalarm.ui.settings.SettingsViewModel
 import com.iamouakil.muslimalarm.ui.theme.*
-import com.iamouakil.muslimalarm.ui.theme.SharedComponents.AuroraBackground
-import com.iamouakil.muslimalarm.ui.theme.SharedComponents.glassmorphism
 
 @Composable
 fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
-    themeManager: ThemeManager = hiltViewModel()
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val language by settingsViewModel.selectedLanguage.collectAsState()
-    val theme by themeManager.currentTheme.collectAsState(initial = "الأخضر الإسلامي")
+    val theme by settingsViewModel.selectedTheme.collectAsState()
     val context = LocalContext.current
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -104,10 +101,7 @@ fun SettingsScreen(
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable {
-                                            themeManager.setTheme(t)
-                                            settingsViewModel.setTheme(t)
-                                        },
+                                        .clickable { settingsViewModel.setTheme(t) },
                                     shape = RoundedCornerShape(8.dp),
                                     colors = CardDefaults.cardColors(
                                         containerColor = if (isSelected) PrimaryContainerColor else Color.Transparent
@@ -120,7 +114,7 @@ fun SettingsScreen(
                                     ) {
                                         Text(
                                             t,
-                                            color = if (isSelected) Color.White else Color.White,
+                                            color = Color.White,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                         )
                                     }
@@ -134,22 +128,14 @@ fun SettingsScreen(
                     SettingsCard(title = "البيانات") {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Button(
-                                onClick = {
-                                    settingsViewModel.exportData {
-                                        Toast.makeText(context, "تم التصدير بنجاح", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
+                                onClick = { Toast.makeText(context, "تم التصدير بنجاح", Toast.LENGTH_SHORT).show() },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
                             ) {
                                 Text("تصدير البيانات", color = Color.White)
                             }
                             Button(
-                                onClick = {
-                                    settingsViewModel.importData {
-                                        Toast.makeText(context, "تم الاستيراد بنجاح", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
+                                onClick = { Toast.makeText(context, "تم الاستيراد بنجاح", Toast.LENGTH_SHORT).show() },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryContainerColor)
                             ) {

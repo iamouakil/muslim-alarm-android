@@ -1,12 +1,12 @@
 ﻿package com.iamouakil.muslimalarm.ui.settings
 
 import android.content.Context
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iamouakil.muslimalarm.ui.theme.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,30 +16,34 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private val Context.appSettingsDataStore by preferencesDataStore(name = "app_settings")
+
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val themeManager: ThemeManager
 ) : ViewModel() {
-    private val dataStore = PreferenceDataStoreFactory.create {
-        context.preferencesDataStoreFile("app_settings")
-    }
 
-    private val languageKey = stringPreferencesKey("language")
-    private val themeKey = stringPreferencesKey("theme")
+    private val LANGUAGE_KEY = stringPreferencesKey("app_language")
 
-    val selectedLanguage: StateFlow<String> = dataStore.data
-        .map { it[languageKey] ?: "العربية" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "العربية")
+    val selectedLanguage: StateFlow<String> = context.appSettingsDataStore.data
+        .map { it[LANGUAGE_KEY] ?: "العربية" }
+        .stateIn(viewModelScope, SharingStarted.Lazily, "العربية")
 
-    val selectedTheme: StateFlow<String> = dataStore.data
-        .map { it[themeKey] ?: "الأخضر الإسلامي" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "الأخضر الإسلامي")
+    val selectedTheme: StateFlow<String> = themeManager.currentTheme
+        .stateIn(viewModelScope, SharingStarted.Lazily, "الأخضر الإسلامي")
 
     fun setLanguage(lang: String) {
-        viewModelScope.launch { dataStore.edit { it[languageKey] = lang } }
+        viewModelScope.launch {
+            context.appSettingsDataStore.edit { prefs ->
+                prefs[LANGUAGE_KEY] = lang
+            }
+        }
     }
 
     fun setTheme(theme: String) {
-        viewModelScope.launch { dataStore.edit { it[themeKey] = theme } }
+        viewModelScope.launch {
+            themeManager.setTheme(theme)
+        }
     }
 }
