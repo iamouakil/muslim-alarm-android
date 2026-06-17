@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,6 +24,8 @@ import com.iamouakil.muslimalarm.ui.onboarding.OnboardingViewModel
 import com.iamouakil.muslimalarm.ui.screens.HomeScreen
 import com.iamouakil.muslimalarm.ui.screens.SettingsScreen
 import com.iamouakil.muslimalarm.ui.screens.SleepScreen
+import com.iamouakil.muslimalarm.ui.theme.BgColor
+import com.iamouakil.muslimalarm.ui.theme.PrimaryColor
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +120,3 @@ fun NavGraph() {
         }
     }
 }
-
-import androidx.compose.ui.graphics.Color
-import com.iamouakil.muslimalarm.ui.theme.BgColor
-import com.iamouakil.muslimalarm.ui.theme.PrimaryColor
