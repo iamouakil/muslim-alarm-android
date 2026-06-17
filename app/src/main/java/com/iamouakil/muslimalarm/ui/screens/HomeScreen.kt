@@ -15,7 +15,8 @@ import com.iamouakil.muslimalarm.data.hijri.HijriDate
 import com.iamouakil.muslimalarm.ui.prayer.PrayerTimesViewModel
 import com.iamouakil.muslimalarm.ui.theme.*
 import androidx.compose.ui.graphics.Color
-import java.time.LocalTime
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun HomeScreen(viewModel: PrayerTimesViewModel = hiltViewModel()) {
@@ -24,10 +25,13 @@ fun HomeScreen(viewModel: PrayerTimesViewModel = hiltViewModel()) {
     val countdown by viewModel.countdown.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()
 
-    val greeting = when (LocalTime.now().hour) {
-        in 6..11 -> "صباح الخير"
-        in 12..17 -> "السلام عليكم"
-        else -> "مساء الخير"
+    val greeting = remember {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        when (hour) {
+            in 6..11 -> "صباح الخير"
+            in 12..17 -> "السلام عليكم"
+            else -> "مساء الخير"
+        }
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -38,17 +42,27 @@ fun HomeScreen(viewModel: PrayerTimesViewModel = hiltViewModel()) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(greeting, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = PrimaryColor)
+                Text(greeting, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = PrimaryColor)
                 Text(HijriDate.getTodayHijriString(), fontSize = 16.sp, color = Color.White)
                 Spacer(modifier = Modifier.height(8.dp))
+                
+                Card(
+                    modifier = Modifier.fillMaxWidth().glassmorphism(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("المدينة: $selectedCity", color = Color.White, fontSize = 18.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (nextPrayer != null) {
+                            Text("الصلاة القادمة: ${nextPrayer!!.first}", color = SecondaryColor, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                            Text("الوقت المتبقي: $countdown", color = Color.White, fontSize = 18.sp)
+                        } else {
+                            CircularProgressIndicator(color = PrimaryColor)
+                        }
+                    }
+                }
 
                 if (prayerTimes != null) {
-                    Text("المدينة: $selectedCity", color = Color.White)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("الصلاة القادمة: ${nextPrayer?.first ?: ""}", color = SecondaryColor, fontSize = 20.sp)
-                    Text("الوقت المتبقي: $countdown", color = Color.White, fontSize = 18.sp)
-
-                    Spacer(modifier = Modifier.height(16.dp))
                     PrayerTimeRow("الفجر", prayerTimes!!.fajr)
                     PrayerTimeRow("الشروق", prayerTimes!!.sunrise)
                     PrayerTimeRow("الظهر", prayerTimes!!.dhuhr)
@@ -65,12 +79,14 @@ fun HomeScreen(viewModel: PrayerTimesViewModel = hiltViewModel()) {
 
 @Composable
 fun PrayerTimeRow(name: String, timeMillis: Long) {
-    val time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(timeMillis))
+    val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timeMillis))
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(name, color = PrimaryColor, fontWeight = FontWeight.Medium)
-        Text(time, color = Color.White)
+        Text(name, color = PrimaryColor, fontWeight = FontWeight.Medium, fontSize = 18.sp)
+        Text(time, color = Color.White, fontSize = 18.sp)
     }
 }

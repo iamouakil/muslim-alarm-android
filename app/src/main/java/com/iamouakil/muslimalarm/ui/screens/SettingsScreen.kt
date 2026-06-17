@@ -25,9 +25,7 @@ import com.iamouakil.muslimalarm.ui.settings.SettingsViewModel
 import com.iamouakil.muslimalarm.ui.theme.*
 
 @Composable
-fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = hiltViewModel()
-) {
+fun SettingsScreen(settingsViewModel: SettingsViewModel = hiltViewModel()) {
     val language by settingsViewModel.selectedLanguage.collectAsState()
     val theme by settingsViewModel.selectedTheme.collectAsState()
     val context = LocalContext.current
@@ -35,110 +33,47 @@ fun SettingsScreen(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         AuroraBackground {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize().padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    Text(
-                        text = "الإعدادات",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryColor,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                    Text("الإعدادات", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = PrimaryColor)
                 }
-
                 item {
-                    SettingsCard(title = "اللغة") {
+                    SettingsCard("اللغة") {
                         Column {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { settingsViewModel.setLanguage("العربية") }
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = language == "العربية",
-                                    onClick = { settingsViewModel.setLanguage("العربية") },
-                                    colors = RadioButtonDefaults.colors(selectedColor = PrimaryColor)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("العربية", fontSize = 16.sp, color = Color.White)
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { settingsViewModel.setLanguage("English") }
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = language == "English",
-                                    onClick = { settingsViewModel.setLanguage("English") },
-                                    colors = RadioButtonDefaults.colors(selectedColor = PrimaryColor)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("English", fontSize = 16.sp, color = Color.White)
-                            }
+                            LanguageRow("العربية", language == "العربية") { settingsViewModel.setLanguage("العربية") }
+                            LanguageRow("English", language == "English") { settingsViewModel.setLanguage("English") }
                         }
                     }
                 }
-
                 item {
-                    SettingsCard(title = "المظهر") {
+                    SettingsCard("المظهر") {
                         val themes = listOf("الأخضر الإسلامي", "الأزرق الليلي", "الذهبي", "الرمضاني")
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.height(140.dp)
-                        ) {
+                        LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.height(140.dp)) {
                             items(themes) { t ->
                                 val isSelected = t == theme
                                 Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { settingsViewModel.setTheme(t) },
+                                    modifier = Modifier.fillMaxWidth().clickable { settingsViewModel.setTheme(t) },
                                     shape = RoundedCornerShape(8.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = if (isSelected) PrimaryContainerColor else Color.Transparent
-                                    ),
+                                    colors = CardDefaults.cardColors(containerColor = if (isSelected) PrimaryContainerColor else Color.Transparent),
                                     border = if (isSelected) BorderStroke(2.dp, PrimaryColor) else BorderStroke(1.dp, Color.Gray)
                                 ) {
-                                    Box(
-                                        modifier = Modifier.padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            t,
-                                            color = Color.White,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                        )
+                                    Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                                        Text(t, color = Color.White, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
                                     }
                                 }
                             }
                         }
                     }
                 }
-
                 item {
-                    SettingsCard(title = "البيانات") {
+                    SettingsCard("البيانات") {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Button(
-                                onClick = { Toast.makeText(context, "تم التصدير بنجاح", Toast.LENGTH_SHORT).show() },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
-                            ) {
+                            Button(onClick = { Toast.makeText(context, "تم التصدير", Toast.LENGTH_SHORT).show() }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)) {
                                 Text("تصدير البيانات", color = Color.White)
                             }
-                            Button(
-                                onClick = { Toast.makeText(context, "تم الاستيراد بنجاح", Toast.LENGTH_SHORT).show() },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryContainerColor)
-                            ) {
+                            Button(onClick = { Toast.makeText(context, "تم الاستيراد", Toast.LENGTH_SHORT).show() }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = PrimaryContainerColor)) {
                                 Text("استيراد البيانات", color = Color.White)
                             }
                         }
@@ -150,25 +85,22 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsCard(title: String, content: @Composable () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .glassmorphism(),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+fun LanguageRow(language: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = PrimaryColor,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+        RadioButton(selected = selected, onClick = onClick, colors = RadioButtonDefaults.colors(selectedColor = PrimaryColor))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(language, fontSize = 16.sp, color = Color.White)
+    }
+}
+
+@Composable
+fun SettingsCard(title: String, content: @Composable () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().glassmorphism(), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(title, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = PrimaryColor, modifier = Modifier.padding(bottom = 16.dp))
             content()
         }
     }
